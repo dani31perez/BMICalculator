@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -38,6 +39,8 @@ fun BMIApp() {
     val context = LocalContext.current
     var weight by remember { mutableFloatStateOf(0f) }
     var height by remember { mutableFloatStateOf(0f) }
+    var BMI by remember { mutableStateOf<Float?>(null) }
+    var category by remember { mutableStateOf("") }
 
     BMIScreen(
         weight = weight,
@@ -67,7 +70,27 @@ fun BMIApp() {
             }
         }catch (e: NumberFormatException ){
             Toast.makeText(context, "You cannot add text in this input", Toast.LENGTH_SHORT).show()
-        }}
+        }},
+        onClick = {
+            if(weight < 30f)
+                Toast.makeText(context, "Weight must be greater than 30 lbs", Toast.LENGTH_SHORT).show()
+            else
+                if(height < 50f)
+                    Toast.makeText(context, "Height must be greater than 50 cm", Toast.LENGTH_SHORT).show()
+                else{
+                    BMI = (weight/(height*height))*703
+                    if(BMI!! < 18.5f)
+                        category = "Underweight"
+                    else if (BMI!! in 18.5f..24.9f)
+                        category = "Normal weight"
+                    else if (BMI!! in 25f..29.9f )
+                        category = "Overweight"
+                    else
+                        category = "Obese"
+                }
+        },
+        BMI = BMI,
+        category = category
     )
 }
 
@@ -76,7 +99,10 @@ fun BMIScreen(
     weight: Float,
     height: Float,
     onWeightChange: (String) -> Unit,
-    onHeightChange: (String) -> Unit
+    onHeightChange: (String) -> Unit,
+    onClick: () -> Unit,
+    BMI: Float?,
+    category: String
 ){
     Column (
         modifier = Modifier
@@ -90,8 +116,8 @@ fun BMIScreen(
                 .padding(16.dp)
         ){
             Text("BMI Calculator", fontSize = 26.sp, color = Color.White)
-
         }
+
         OutlinedTextField(
             value = if(weight == 0f) "" else weight.toString(),
             onValueChange = {onWeightChange(it)},
@@ -99,7 +125,6 @@ fun BMIScreen(
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
                 .padding(16.dp),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
@@ -111,9 +136,32 @@ fun BMIScreen(
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
                 .padding(16.dp)
         )
+
+        Button(
+            onClick = {onClick()},
+            shape = RoundedCornerShape(0.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(90.dp)
+                .padding(16.dp),
+        ) {
+            Text("Calculate BMI", fontSize = 20.sp)
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+        ){
+            BMI?.let {
+                index ->
+                    Text("Your BMI is:")
+                    Text(index.toString())
+                    Text(category)
+            }
+        }
     }
 
 }
@@ -126,7 +174,10 @@ fun GreetingPreview() {
             weight = 0f,
             height = 0f,
             onWeightChange = {},
-            onHeightChange = {}
+            onHeightChange = {},
+            onClick = {},
+            BMI = 0f,
+            category = ""
         )
     }
 }
