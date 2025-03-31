@@ -9,9 +9,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,7 +42,7 @@ fun BMIApp() {
 
 @Composable
 fun BMIScreen(
-    weight: Float,
+    weight: Float?,
     height: Float
 ){
     Column (
@@ -57,8 +57,29 @@ fun BMIScreen(
                 .padding(16.dp)
         ){
             Text("BMI Calculator", fontSize = 26.sp, color = Color.White)
-        }
 
+        }
+        OutlinedTextField(
+            value = if(weight == 0f) "" else weight.toString(),
+            onValueChange = {},
+            label = { Text("Weight (lbs)") },
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally)
+                .padding(16.dp)
+        )
+
+        OutlinedTextField(
+            value = if(height == 0f) "" else height.toString(),
+            onValueChange = {},
+            label = { Text("Height (cm)") },
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally)
+                .padding(16.dp)
+        )
     }
 
 }
